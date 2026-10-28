@@ -54,6 +54,21 @@ graphs carry that version in their names, `streetGraph-<id>.obj` and `graph-<id>
 `${otp.serialization.version.id}` that `build-config.json` uses: a new OTP builds its own graphs
 rather than failing on the old ones, and each server loads the one it can read.
 
+## Deployment
+
+OTP serves from a compose project of its own, `<project>-otp`, which the deploy playbook does not
+take down. Its compose file ships in each release as `docker-compose.otp.yml`, so when the deploy
+role reverts a failed release, the restored `otp-graph-build` rolls OTP back with it. Traefik
+answers on `SERVER_PORT_OTP` and routes only to an OTP whose healthcheck passes, which it does once
+its graph is loaded. Every build ends in `otp-rollout.sh`, which starts the OTP image the deploy
+named next to the running one, waits for it to load `graph-<id>.obj`, and only then stops the old
+one. Until a graph for the new image exists, the old OTP serves the old graph. The newest three
+published versions are kept, so an older image still finds its graph. A restart without downtime:
+
+```bash
+docker compose -p <project> exec otp-graph-build /app/otp-rollout.sh --force
+```
+
 ## Execute OTP instance
 
 ```bash
