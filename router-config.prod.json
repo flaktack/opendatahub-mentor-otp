@@ -3,10 +3,14 @@
     "numItineraries": 5
   },
   "transit": {
+    "maxNumberOfTransfers": 6,
     "dynamicSearchWindow": {
-      "minWindow": "4h",
-      "maxWindow": "16h"
+      "minWindow": "1h",
+      "maxWindow": "3h"
     }
+  },
+  "ojpApi" : {
+    "hideFeedId" : false
   },
   "vectorTiles": {
     "layers": [
